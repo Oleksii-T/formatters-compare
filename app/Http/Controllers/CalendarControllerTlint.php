@@ -15,7 +15,7 @@ class CalendarControllerTlint extends Controller
     {
         if (!auth()->user()?->isAdmin() && !isdev()) {
             abort(404);
-        
+
         }
 
         // \Log::debug("Jogn Doe");
@@ -56,7 +56,7 @@ class CalendarControllerTlint extends Controller
         ];
 
         $games = $this->getGamesByPeriod($periodStart, $periodEnd)
-            ->when($request->platform, fn ($q) => 
+            ->when($request->platform, fn ($q) =>
                 $q->whereRelation('platforms', 'platforms.id', $request->platform)
             )
             ->get();
