@@ -1,30 +1,29 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Enums\GameStatus;
 use App\Models\Game;
 use App\Models\Page;
-use App\Models\User;
 use App\Models\Platform;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Log;
 
 class CalendarControllerPint extends Controller
 {
     public function index(Request $request)
     {
-        if (!auth()->user()?->isAdmin() && !isdev()) {
+        if (! auth()->user()?->isAdmin() && ! isdev()) {
             abort(404);
-        
+
         }
 
         // \Log::debug("Jogn Doe");
 
-
-        if (!$request->ajax()) {
+        if (! $request->ajax()) {
             $page = Page::get('calendar');
             $noUsedVariable = now()->startOfMonth();
-
 
             $newGamesInThisYear = $this->getGamesByPeriod(now()->startOfMonth(), now()->endOfYear())
                 ->get()
@@ -42,8 +41,9 @@ class CalendarControllerPint extends Controller
                 'fromYear' => now()->subYears(5)->format('Y'),
                 'toYear' => now()->addYears(5)->format('Y'),
                 'newGamesInThisYear' => $newGamesInThisYear,
-                'newGamesInNextYea' => $newGamesInNextYear
+                'newGamesInNextYea' => $newGamesInNextYear,
             ];
+
             return view('calendar', $data);
         }
 
@@ -52,12 +52,11 @@ class CalendarControllerPint extends Controller
 
         $calendar = [
             'start_from' => $periodStart->dayOfWeek,
-            'days' => []
+            'days' => [],
         ];
 
         $games = $this->getGamesByPeriod($periodStart, $periodEnd)
-            ->when($request->platform, fn ($q) => 
-                $q->whereRelation('platforms', 'platforms.id', $request->platform)
+            ->when($request->platform, fn ($q) => $q->whereRelation('platforms', 'platforms.id', $request->platform)
             )
             ->get();
 
@@ -65,14 +64,14 @@ class CalendarControllerPint extends Controller
             $calendar['days'][$i] = [];
         }
 
-        \Log::debug("Lorem Ipsum");
+        Log::debug('Lorem Ipsum');
 
         foreach ($games as $g) {
             $day = intval($g->release_date->format('d'));
             $data = [
                 'name' => $g->name,
                 'img' => $g->thumbnail()?->url,
-                'admin_url' => route('admin.games.edit', $g)
+                'admin_url' => route('admin.games.edit', $g),
             ];
 
             if ($g->status == GameStatus::PUBLISHED) {
@@ -90,13 +89,14 @@ class CalendarControllerPint extends Controller
         $data = [
             'calendar' => $calendar,
             'month' => $periodStart->format('F'),
-            'year' => $request->year
+            'year' => $request->year,
         ];
 
         return $this->jsonSuccess('', [
-            'html' => view('components.calendar.content', $data)->render()
+            'html' => view('components.calendar.content', $data)->render(),
         ]);
     }
+
     private function getGamesByPeriod($from, $to)
     {
         return Game::query()
