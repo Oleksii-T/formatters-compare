@@ -1,0 +1,12 @@
+{
+    "include": [
+        "app",
+        "config",
+        "database",
+        "routes",
+        "tests"
+    ],
+    "exclude": [
+        "app/Http/Controllers/DevController.php"
+    ]
+}

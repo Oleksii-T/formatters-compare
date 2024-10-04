@@ -1,0 +1,5 @@
+{
+    "preset": "laravel",
+    "disabled": [""],
+    "excluded": ["tests/", "app/Http/Controllers/DevController.php"]
+}
